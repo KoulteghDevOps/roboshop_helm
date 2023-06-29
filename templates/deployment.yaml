@@ -32,7 +32,7 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: 878756956432.dkr.ecr.us-east-1.amazonaws.com/{{ .Values.appName }}.{{ .Values.app_version }}
+          image: 878756956432.dkr.ecr.us-east-1.amazonaws.com/{{ .Values.appName }}:{{ .Values.app_version }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
