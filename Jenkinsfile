@@ -1,10 +1,13 @@
 pipeline {
   agent any
+  parameters {
+    string(name: 'component', defaultValue: '', description: 'APP Component Name')
+  }
   stages {
     stage('Clone App Repo') {
       steps {
         dir('APP') {
-          git branch: 'main', url: 'https://github.com/KoulteghDevOps/cart'
+          git branch: 'main', url: 'https://github.com/KoulteghDevOps/${component}'
         }
       }
     }
