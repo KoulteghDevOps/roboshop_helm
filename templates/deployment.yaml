@@ -1,7 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-#  name: {{ include "roboshop.fullname" . }}
   name: {{ .Values.appName }}
   labels:
     {{- include "roboshop.labels" . | nindent 4 }}
@@ -21,6 +20,10 @@ spec:
       labels:
         {{- include "roboshop.selectorLabels" . | nindent 8 }}
     spec:
+      volumes:
+      - name: params-volume
+        emptyDir:
+          sizeLimit: 5Mi
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -28,24 +31,37 @@ spec:
       serviceAccountName: {{ .Values.appName }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: aws-ssm-pm
+          image: 878756956432.dkr.ecr.us-east-1.amazonaws.com/aws-parameter-store:latest
+          imagePullPolicy: Always
+          env:
+            - name: PARAMS
+              value: {{ .Values.params }}
+          volumeMounts:
+            - mountPath: /params
+              name: params-volume
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: 878756956432.dkr.ecr.us-east-1.amazonaws.com/{{ .Values.appName }}:{{ .Values.app_version }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - mountPath: /params
+              name: params-volume
           ports:
             - name: http
-              containerPort: 80
+              containerPort: {{ .Values.appPort }}
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /health
+              port: {{ .Values.appPort }}
           readinessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /health
+              port: {{ .Values.appPort }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
