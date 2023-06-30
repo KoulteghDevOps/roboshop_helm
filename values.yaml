@@ -18,7 +18,9 @@ serviceAccount:
   # Specifies whether a service account should be created
   create: true
   # Annotations to add to the service account
-  annotations: {}
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::878756956432:role/eks-ssm-ps-prod-role
+
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
@@ -81,4 +83,5 @@ tolerations: []
 
 affinity: {}
 
-
+schema:
+  enabled: false
