@@ -5,6 +5,8 @@ metadata:
   name: {{ .Values.appName }}
   labels:
     {{- include "roboshop.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": "pre-install"
 spec:
   template:
     spec:
@@ -21,4 +23,3 @@ spec:
       restartPolicy: Never
   backoffLimit: 4
 {{- end }}
-Footer
